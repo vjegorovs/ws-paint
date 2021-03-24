@@ -11,7 +11,7 @@ jobs:
         working-directory: ./frontend
     steps:
       - uses: actions/checkout@v2
-      - name: Run Unit Tests on push
+      - name: Run Unit Tests on push to any branch?
         run: |
           yarn
           yarn test
