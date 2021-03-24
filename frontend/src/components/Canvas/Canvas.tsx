@@ -40,6 +40,8 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
             this.canvasContext.lineCap = "round";
             this.canvasContext.strokeStyle = "red";
             this.canvasContext.lineWidth = 4;
+
+            document.querySelector("body")!.addEventListener("mousemove", (e) => this.state.isDrawing && this.draw(e as unknown as React.MouseEvent<HTMLCanvasElement, MouseEvent>, true))
         }
     }
 
@@ -79,11 +81,20 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
         this.setState({isDrawing: false});
     }
 
-    private draw = (ev: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
-        const { offsetX, offsetY } = ev.nativeEvent;
-        console.log("DRAWINGSDFGSDFHBDXTYJHSRT");
-        this.canvasContext.lineTo(offsetX, offsetY);
-        this.canvasContext.stroke();
+    private draw = (ev: React.MouseEvent<HTMLCanvasElement, MouseEvent>, body = false) => {
+        let offsetX, offsetY;
+        if (body){
+            offsetX = (ev as unknown as MouseEvent).offsetX;
+            offsetY = (ev as unknown as MouseEvent).offsetY;
+        } else {
+            offsetX = ev.nativeEvent.offsetX;
+            offsetY = ev.nativeEvent.offsetY;
+        }
+        if (this.state.isDrawing) {
+            console.log("DRAWINGSDFGSDFHBDXTYJHSRT");
+            this.canvasContext.lineTo(offsetX, offsetY);
+            this.canvasContext.stroke();
+        }
     }
 }
 

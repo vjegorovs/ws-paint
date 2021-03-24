@@ -4,6 +4,7 @@ module.exports = {
     preset: "ts-jest",
     setupFilesAfterEnv: [
         "<rootDir>/test-setup.ts",
+        "jest-canvas-mock",
     ],
     transform: {
         "^.+\\.(j|t)sx?$": "ts-jest",
