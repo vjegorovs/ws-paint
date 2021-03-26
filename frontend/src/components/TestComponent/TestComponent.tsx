@@ -16,15 +16,14 @@ interface TestComponentDispatchProps {
 
 export class TestComponent extends React.Component<TestComponentProps & TestComponentDispatchProps> {
 
-
-
     public render() {
         return (
             <>
-                <div className={styles.test}> MOOO </div>
                 <button onClick={() => this.props.yoink(false)}>123</button>
+                <div className={styles.test}> MOOO </div>
                 <div className={classnames(styles.ginormous,{
                     [styles.fun]: true,
+                    [styles.pointer]: true,
                 })}> Pretty pictures and funny memes </div>
                 {this.props.yeet && "the connect worked"}
             </>
