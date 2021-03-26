@@ -81,7 +81,6 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
                    }}
                >
                </canvas>
-                <h1>oops</h1>
             </>
         )
     }
