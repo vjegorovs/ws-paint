@@ -2,23 +2,32 @@ import React from "react";
 
 import styles from "./Canvas.scss"
 import {connect} from "react-redux";
-import {RootState} from "../../index";
-import {changeSettings, selectYeet} from "../../reducers/settings";
+import {RootState} from "../../store";
 import {X, Y} from "./CanvasConsts";
+import {
+    changeCanvasDrawingState,
+    changeCanvasLineWidth,
+    changeCanvasStrokeStyle,
+    selectCanvasDrawingState,
+    selectCanvasLineWidth,
+    selectCanvasStrokeStyle
+} from "../../store/canvasSettings";
 
-interface CanvasProps {
-    yeet?: boolean;
-}
-
-interface CanvasDispatchProps {
-    yoink?: typeof changeSettings;
-}
-
-interface CanvasStateProps {
+export interface CanvasOwnProps {
+    strokeStyle: CanvasFillStrokeStyles["strokeStyle"];
+    lineWidth: number;
     isDrawing: boolean;
 }
 
-export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,CanvasStateProps> {
+export interface CanvasDispatchProps {
+    changeLineWidth: typeof changeCanvasLineWidth;
+    changeDrawingState: typeof changeCanvasDrawingState;
+    changeStrokeStyle: typeof changeCanvasStrokeStyle;
+}
+
+export type CanvasProps = CanvasOwnProps & CanvasDispatchProps;
+
+export class Canvas extends React.Component<CanvasProps> {
     private readonly myRef;
     private canvasElement: HTMLCanvasElement | undefined;
     private canvasContext: CanvasRenderingContext2D | null | undefined;
@@ -27,10 +36,6 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
 
     constructor(props: CanvasProps) {
         super(props);
-        this.state = {
-            isDrawing: false
-        };
-
         this.myRef = React.createRef<HTMLCanvasElement>();
     }
 
@@ -39,7 +44,7 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
             this.canvasElement = this.myRef.current;
             const innerWidth = window.innerWidth;
             const innerHeight = window.innerHeight;
-            this.canvasElement.width = innerWidth * 2;
+            this.canvasElement.width = innerWidth * 2; // get value from window.devicePixelRatio
             this.canvasElement.height = innerHeight * 2;
             this.canvasElement.style.width = `${innerWidth}px`;
             this.canvasElement.style.height = `${innerHeight}px`;
@@ -48,13 +53,26 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
             if (this.canvasContext) {
                 this.canvasContext.scale(2, 2);
                 this.canvasContext.lineCap = "round";
-                this.canvasContext.strokeStyle = "black";
-                this.canvasContext.lineWidth = 15;
+                this.canvasContext.strokeStyle = this.props.strokeStyle;
+                this.canvasContext.lineWidth = this.props.lineWidth;
                 this.canvasContext.translate(0.5, 0.5);
             }
 
             // document.querySelector("body")!.addEventListener("mousemove", (e) => this.state.isDrawing && this.draw(e as unknown as React.MouseEvent<HTMLCanvasElement, MouseEvent>, true))
             this.drawTick();
+        }
+    }
+
+    public shouldComponentUpdate(nextProps: CanvasProps): boolean {
+        return (nextProps.lineWidth !== this.props.lineWidth
+            || nextProps.strokeStyle !== this.props.strokeStyle
+        );
+    }
+
+    public componentDidUpdate(prevProps: Readonly<CanvasProps>, prevState: Readonly<{}>, snapshot?: any) {
+        if (this.canvasContext){
+            this.canvasContext.lineWidth = this.props.lineWidth;
+            this.canvasContext.strokeStyle = this.props.strokeStyle;
         }
     }
 
@@ -65,7 +83,7 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
                    className={styles.canvas}
                    ref={this.myRef}
                    onMouseMove={(e) => {
-                       if (this.state.isDrawing) {
+                       if (this.props.isDrawing) {
                            console.log("ISDRAWING");
                         this.addPointToQueue(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
                        }
@@ -89,12 +107,12 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
         const { offsetX, offsetY } = ev.nativeEvent;
         this.clearQueue();
         this.addPointToQueue(offsetX, offsetY);
-        this.setState({isDrawing: true});
+        this.props.changeDrawingState(true);
         this.drawTick();
     }
 
     private end = () => {
-        this.setState({isDrawing: false});
+        this.props.changeDrawingState(false);
     }
 
     private drawTick = () => {
@@ -132,14 +150,18 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
     }
 }
 
-function mapStateToProps(state: RootState, ownProps: any): CanvasProps {
+function mapStateToProps(state: RootState): CanvasOwnProps {
     return {
-        yeet: selectYeet(state),
+        lineWidth: selectCanvasLineWidth(state),
+        strokeStyle: selectCanvasStrokeStyle(state),
+        isDrawing: selectCanvasDrawingState(state),
     }
 }
 
 const mapDispatchToProps = {
-    yoink: changeSettings,
+    changeLineWidth: changeCanvasLineWidth,
+    changeStrokeStyle: changeCanvasStrokeStyle,
+    changeDrawingState: changeCanvasDrawingState,
 }
 
-export const CanvasConnected = connect<CanvasProps,CanvasDispatchProps, {}, RootState>(mapStateToProps, mapDispatchToProps)(Canvas);
+export const CanvasConnected = connect<CanvasOwnProps,CanvasDispatchProps, {}, RootState>(mapStateToProps, mapDispatchToProps)(Canvas);
