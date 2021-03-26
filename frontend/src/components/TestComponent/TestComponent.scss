@@ -9,6 +9,7 @@
 .ginormous {
   font-size: 150px;
   width: 50%;
+  pointer-events: none;
 
   &.fun {
     background-color: rebeccapurple;

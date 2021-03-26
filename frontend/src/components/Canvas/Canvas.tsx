@@ -6,7 +6,7 @@ import {RootState} from "../../index";
 import {changeSettings, selectYeet} from "../../reducers/settings";
 
 interface CanvasProps {
-    yeet?: boolean
+    yeet?: boolean;
 }
 
 interface CanvasDispatchProps {
@@ -19,7 +19,10 @@ interface CanvasStateProps {
 
 export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,CanvasStateProps> {
     private readonly myRef;
-    private canvasContext: any;
+    private canvasElement: HTMLCanvasElement | undefined;
+    private canvasContext: CanvasRenderingContext2D | null | undefined;
+    private drawingQueue: [number,number][] = [];
+    private queueCounter: number = 0;
 
     constructor(props: CanvasProps) {
         super(props);
@@ -32,14 +35,16 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
 
     componentDidMount() {
         if (this.myRef.current){
-            const current = this.myRef.current;
-            current.width = window.innerWidth;
-            current.height = window.innerHeight;
-            this.canvasContext = current.getContext("2d")
+            this.canvasElement = this.myRef.current;
+            this.canvasElement.width = window.innerWidth;
+            this.canvasElement.height = window.innerHeight;
+            this.canvasContext = this.canvasElement.getContext("2d")
             console.log(this.canvasContext);
-            this.canvasContext.lineCap = "round";
-            this.canvasContext.strokeStyle = "red";
-            this.canvasContext.lineWidth = 4;
+            if (this.canvasContext) {
+                this.canvasContext.lineCap = "round";
+                this.canvasContext.strokeStyle = "black";
+                this.canvasContext.lineWidth = 24;
+            }
 
             document.querySelector("body")!.addEventListener("mousemove", (e) => this.state.isDrawing && this.draw(e as unknown as React.MouseEvent<HTMLCanvasElement, MouseEvent>, true))
         }
@@ -62,7 +67,6 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
                        this.end();
                    }}
                >
-
                </canvas>
                 <h1>oops</h1>
             </>
@@ -71,18 +75,22 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
 
     private start = (ev: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
         const { offsetX, offsetY } = ev.nativeEvent;
-        this.canvasContext.beginPath();
-        this.canvasContext.moveTo(offsetX, offsetY);
-        this.setState({isDrawing: true});
+        this.clearQueue();
+        this.addPointToQueue(offsetX, offsetY);
+        if (this.canvasContext) {
+            this.setState({isDrawing: true});
+            this.canvasContext.beginPath();
+            this.canvasContext.moveTo(offsetX, offsetY);
+        }
     }
 
     private end = () => {
-        this.canvasContext.closePath();
+        // this.canvasContext!.closePath();
         this.setState({isDrawing: false});
     }
 
-    private draw = (ev: React.MouseEvent<HTMLCanvasElement, MouseEvent>, body = false) => {
-        let offsetX, offsetY;
+    private drawTick = (ev: React.MouseEvent<HTMLCanvasElement, MouseEvent>, body = false) => {
+        let offsetX: number, offsetY: number;
         if (body){
             offsetX = (ev as unknown as MouseEvent).offsetX;
             offsetY = (ev as unknown as MouseEvent).offsetY;
@@ -90,13 +98,36 @@ export class Canvas extends React.Component<CanvasProps & CanvasDispatchProps,Ca
             offsetX = ev.nativeEvent.offsetX;
             offsetY = ev.nativeEvent.offsetY;
         }
-        if (this.state.isDrawing) {
+        if (this.state.isDrawing && this.canvasContext) {
             console.log("DRAWINGSDFGSDFHBDXTYJHSRT");
             this.canvasContext.lineTo(offsetX, offsetY);
             this.canvasContext.stroke();
         }
     }
+
+    private clearQueue = () => {
+        this.queueCounter = 0;
+        this.drawingQueue = [];
+    }
+
+    private addPointToQueue = (x:number, y:number) => {
+        this.drawingQueue.push([x, y])
+    }
+
+    private drawingHandle() {
+
+    }
 }
+
+// // this.canvasContext.lineTo(offsetX, offsetY);
+// // this.canvasContext.stroke();
+//
+// requestAnimationFrame(() => {
+//     this.canvasContext.moveTo(offsetX, offsetY);
+//     this.canvasContext.arc(Math.round(offsetX),Math.round(offsetY),8,0,Math.PI * 2);
+//     this.canvasContext.arc(Math.round(offsetX),Math.round(offsetY),8,0,Math.PI * 2);
+//     this.canvasContext.fill();
+// })
 
 function mapStateToProps(state: RootState, ownProps: any): CanvasProps {
     return {

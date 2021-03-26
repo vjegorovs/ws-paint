@@ -6,6 +6,7 @@ export function App() {
     return (
         <>
             <CanvasConnected />
+            <div>test</div>
             <TestComponentConnected />
         </>
     );
