@@ -1,19 +1,23 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const path = require("path");
 
 module.exports = {
     entry: "./src/index.tsx",
+    output: {
+        path: path.resolve(__dirname, './dist'),
+        filename: 'index_bundle.js',
+    },
     mode: "production",
     devtool: "cheap-source-map",
     module: {
         rules: [
             {
-                test: /\.tsx?$/,
-                use: "ts-loader",
+                test: /\.(ts|tsx)$/,
+                use: 'ts-loader',
                 exclude: [
                     "/node_modules/",
-                    "/src/tests/",
-                    "/tests/.*\\.(test|spec)?\\.(ts|tsx)$",
+                    "/src/*\\.(test|spec)?\\\\.(ts|tsx)$",
                 ],
             },
             {
@@ -21,17 +25,34 @@ module.exports = {
                 loader: "html-loader",
             },
             {
-                test: /\.css$/i,
-                use: ["style-loader", "css-loader"],
+                test: /\.scss$/,
+                exclude: /node_modules/,
+                use: [
+                    "style-loader",
+                    {
+                        loader: "css-loader",
+                        options: {
+                            modules: true,
+                            importLoaders: 1,
+                            sourceMap: true,
+                        }
+                    },
+                    {
+                        loader: "sass-loader",
+                    },
+                ]
             },
         ],
     },
     resolve: {
-        extensions: [".tsx", ".ts", ".js"],
+        extensions: ['.ts', '.tsx', '.js', '.css', '.scss'],
     },
-    output: {
-        filename: "main.js",
-        path: path.resolve(__dirname, "dist"),
-    },
-    plugins: [new HtmlWebpackPlugin({ template: "./src/index.html" })],
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: "Testyyyy",
+            template: "./src/index.html",
+            inject: "body"
+        }),
+        new CleanWebpackPlugin.CleanWebpackPlugin(),
+    ],
 };
