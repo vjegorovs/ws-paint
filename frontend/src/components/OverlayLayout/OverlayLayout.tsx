@@ -5,7 +5,7 @@ import styles from "./OverlayLayout.scss"
 import {connect} from "react-redux";
 import { TestComponentConnected } from "../TestComponent/TestComponent";
 import {PropsWithChildren} from "react";
-import {RootState} from "../../index";
+import {RootState} from "../../store";
 
 export interface OverlayLayoutOwnProps {
 

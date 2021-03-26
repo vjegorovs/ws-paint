@@ -3,8 +3,9 @@ import classnames from "classnames";
 
 import styles from "./TestComponent.scss"
 import {connect} from "react-redux";
-import {RootState} from "../../index";
-import {changeSettings, selectYeet} from "../../reducers/settings";
+import {changeSettings, selectYeet} from "../../store/settings";
+import {RootState} from "../../store";
+import { changeCanvasLineWidth } from "../../store/canvasSettings";
 
 interface TestComponentProps {
     yeet: boolean
@@ -12,6 +13,7 @@ interface TestComponentProps {
 
 interface TestComponentDispatchProps {
     yoink: typeof changeSettings;
+    test: typeof changeCanvasLineWidth;
 }
 
 export class TestComponent extends React.Component<TestComponentProps & TestComponentDispatchProps> {
@@ -19,7 +21,12 @@ export class TestComponent extends React.Component<TestComponentProps & TestComp
     public render() {
         return (
             <>
-                <button onClick={() => this.props.yoink(false)}>123</button>
+                <button
+                    className={styles.pointer}
+                    onClick={() => {
+                    this.props.yoink(false);
+                    this.props.test(22);
+                }}>123</button>
                 <div className={styles.test}> MOOO </div>
                 <div className={classnames(styles.ginormous,{
                     [styles.fun]: true,
@@ -40,6 +47,7 @@ function mapStateToProps(state: RootState, ownProps: any): TestComponentProps {
 
 const mapDispatchToProps = {
     yoink: changeSettings,
+    test: changeCanvasLineWidth,
 }
 
 export const TestComponentConnected = connect<TestComponentProps,TestComponentDispatchProps, {}, RootState>(mapStateToProps, mapDispatchToProps)(TestComponent);
