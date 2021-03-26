@@ -6,11 +6,13 @@ import { changeCanvasDrawingState, changeCanvasLineWidth, changeCanvasStrokeStyl
 
 describe("test test suite",() => {
 
+    const mockDispatchDrawingStateFn = jest.fn() as unknown as typeof changeCanvasDrawingState;
+
     const mockCanvasProps: CanvasProps = {
         strokeStyle: "black",
         lineWidth: 4,
         isDrawing: false,
-        changeDrawingState: jest.fn() as unknown as typeof changeCanvasDrawingState,
+        changeDrawingState: mockDispatchDrawingStateFn,
         changeLineWidth: jest.fn() as unknown as typeof changeCanvasLineWidth,
         changeStrokeStyle: jest.fn() as unknown as typeof changeCanvasStrokeStyle,
     }
@@ -19,16 +21,20 @@ describe("test test suite",() => {
     test("uno", () =>{
         const testCanvas = shallow(<Canvas {...mockCanvasProps} />)
 
-        expect(testCanvas.find("h1").text()).toBe("oops");
+        expect(testCanvas.find("canvas")).toBeDefined();
     });
     test("dos", () => {
         const testCanvas = mount(<Canvas {...mockCanvasProps} />)
         testCanvas.simulate("mouseDown");
         
-        expect(testCanvas.state()).toEqual({
-            isDrawing: true,
-        });
+        expect(mockDispatchDrawingStateFn).toHaveBeenCalled();
 
         testCanvas.unmount();
+    })
+    test("tres", () => {
+        // placeholder third test
+        const testCanvas = shallow(<Canvas {...mockCanvasProps} />)
+
+        expect(testCanvas.instance()).toBeInstanceOf(Canvas);
     })
 })

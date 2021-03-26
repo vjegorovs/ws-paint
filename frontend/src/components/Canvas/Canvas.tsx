@@ -84,17 +84,13 @@ export class Canvas extends React.Component<CanvasProps> {
                    ref={this.myRef}
                    onMouseMove={(e) => {
                        if (this.props.isDrawing) {
-                           console.log("ISDRAWING");
                         this.addPointToQueue(e.nativeEvent.offsetX, e.nativeEvent.offsetY)
                        }
                    }}
                    onMouseDown={(e) => {
-                       console.log("MouseDOWN");
-                       console.log(e);
                        this.start(e);
                    }}
                    onMouseUp={() => {
-                       console.log("MouseUP")
                        this.end();
                    }}
                >
