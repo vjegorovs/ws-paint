@@ -1,40 +1,38 @@
 import * as React from "react";
-// import classnames from "classnames";
+import classnames from "classnames";
 
 import styles from "./OverlayLayout.scss";
 import { connect } from "react-redux";
 import { TestComponentConnected } from "../TestComponent/TestComponent";
 import { PropsWithChildren } from "react";
 import { RootState } from "../../store";
+import { selectCanvasDrawingState } from "../../store/canvasSettings";
 
-export interface OverlayLayoutOwnProps {
-
-}
-
-export interface OverlayLayoutStateProps {
-
+export interface OverlayLayoutProps {
+	isDrawing: boolean;
 }
 
 export interface OverlayLayoutDispatchProps {
 
 }
 
-export type OverlayLayoutProps = OverlayLayoutOwnProps | OverlayLayoutStateProps | OverlayLayoutDispatchProps;
-
-export function OverlayLayout({ children }: PropsWithChildren<OverlayLayoutProps>): JSX.Element {
+export function OverlayLayout({ isDrawing, children }: PropsWithChildren<OverlayLayoutProps & OverlayLayoutDispatchProps>) {
 
 	return (
 		<div className={styles.overlayWrapper}>
-			<div className={styles.test}>Yeet</div>
-			{children}
-			<TestComponentConnected />
+			<div className={styles.overlayTop} />
+			<div className={classnames(styles.overlayBottom, {
+				[styles.isDrawing]: isDrawing,
+			})}>
+				<TestComponentConnected />
+			</div>
 		</div>
 	);
 }
 
-function mapStateToProps(state: RootState, ownProps: OverlayLayoutOwnProps): OverlayLayoutProps {
+function mapStateToProps(state: RootState): OverlayLayoutProps {
 	return {
-
+		isDrawing: selectCanvasDrawingState(state),
 	};
 }
 

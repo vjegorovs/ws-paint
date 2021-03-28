@@ -31,7 +31,6 @@ export function HomeScreen(props: PropsWithChildren<HomeScreenProps> & RouteProp
 		<>
 			<CanvasConnected />
 			<OverlayLayoutConnected />
-
 			<Outlet />
 		</>
 	);

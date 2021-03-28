@@ -30,7 +30,6 @@ export class TestComponent extends React.Component<TestComponentProps & TestComp
 				<div className={styles.test}> MOOO </div>
 				<div className={classnames(styles.ginormous, {
 					[styles.fun]: true,
-					[styles.pointer]: true,
 				})}> Pretty pictures and funny memes </div>
 				{this.props.yeet && "the connect worked"}
 			</>
@@ -39,7 +38,7 @@ export class TestComponent extends React.Component<TestComponentProps & TestComp
 
 }
 
-function mapStateToProps(state: RootState, ownProps: any): TestComponentProps {
+function mapStateToProps(state: RootState): TestComponentProps {
 	return {
 		yeet: selectYeet(state),
 	};
