@@ -1,0 +1,8 @@
+node_modules/
+dist/
+coverage/
+**/*.scss.d.ts
+.eslintrc.js
+*.config.js
+*.prod.js
+test-setup.ts

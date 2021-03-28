@@ -4,7 +4,7 @@ export const TEST_ACTION_PERFORMED = "USER_TEST_ACTION";
 export const TEST_ACTION_PERFORMED_WITH_PAYLOAD = "USER_TEST_ACTION_WITH_PAYLOAD";
 
 export function dispatchTestAction() {
-    return { type: TEST_ACTION_PERFORMED } as const;
+	return { type: TEST_ACTION_PERFORMED } as const;
 }
 
 export interface TestActionWithoutPayload extends Action {
@@ -16,7 +16,7 @@ export interface TestActionWithPayload extends Action {
     payload: boolean;
 }
 export function dispatchTestActionWithPayload(bool: boolean): TestActionWithPayload {
-    return { type: TEST_ACTION_PERFORMED_WITH_PAYLOAD, payload: bool };
+	return { type: TEST_ACTION_PERFORMED_WITH_PAYLOAD, payload: bool };
 }
 
 type TestActions = TestActionWithPayload & TestActionWithoutPayload;
@@ -27,16 +27,16 @@ export interface TestState {
 }
 
 export const intialTestState = {
-    test: false,
-}
+	test: false,
+};
 
 
 export function testReducer(state = intialTestState, action: TestActions): TestState {
-    switch (action.type) {
-        case TEST_ACTION_PERFORMED_WITH_PAYLOAD: {
-            return { ...state, test: action.payload }
-        }
-        default:
-            return state;
-    }
+	switch (action.type) {
+	case TEST_ACTION_PERFORMED_WITH_PAYLOAD: {
+		return { ...state, test: action.payload };
+	}
+	default:
+		return state;
+	}
 }

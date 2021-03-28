@@ -56,8 +56,10 @@ module.exports = {
         new CleanWebpackPlugin.CleanWebpackPlugin(),
     ],
     devServer: {
-        contentBase: path.join(__dirname, "dist"),
         compress: true,
         port: 9000,
+        contentBase: path.resolve(__dirname, "dist"),
+        historyApiFallback: { index: "/", disableDotRule: true },
+        hot: true
     },
 };
