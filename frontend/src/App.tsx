@@ -8,6 +8,8 @@ import {
 } from "react-router-dom";
 import { HomeScreenConnected } from "./components/HomeScreen/HomeScreen";
 
+// React.lazy() route component importing?
+
 export function App() {
 	return (
 		<BrowserRouter>
