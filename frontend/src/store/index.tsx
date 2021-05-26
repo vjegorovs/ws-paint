@@ -1,23 +1,27 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { changeSettings, settingsReducer } from "./settings";
 import { testReducer } from "../components/TestComponent/state/TestComponent";
 import { canvasSettingsReducer } from "./canvasSettings";
+import { canvasSettingsMiddleware } from "./middlewares/canvasSettingsMiddleware";
 
+export type RootState = ReturnType<typeof rootReducer>;
 
-export const store = configureStore({
-	reducer: {
-		settings: settingsReducer,
-		canvasSettings: canvasSettingsReducer,
-		//@ts-ignore
-		test: testReducer,
-	},
+const rootReducer = combineReducers({
+	settings: settingsReducer,
+	canvasSettings: canvasSettingsReducer,
+	//@ts-ignore
+	test: testReducer,
 });
 
-export type RootState = ReturnType<typeof store.getState>;
-export type RootDispatch = typeof store.dispatch;
+export const store = configureStore({
+	reducer: rootReducer,
+	middleware: [canvasSettingsMiddleware] as const,
+});
 
-console.log(changeSettings(false));
-console.log(store.dispatch(changeSettings(false)));
+
+export type RootDispatch = typeof store.dispatch;
+export type AppDispatch = typeof store.dispatch;
+
 
 setTimeout(() => {
 	console.log("afd");

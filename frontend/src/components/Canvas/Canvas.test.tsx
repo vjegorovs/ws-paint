@@ -2,7 +2,7 @@ import React from "react";
 import { mount, shallow } from "enzyme";
 
 import { Canvas, CanvasProps } from "./Canvas";
-import { changeCanvasDrawingState, changeCanvasLineWidth, changeCanvasStrokeStyle } from "../../store/canvasSettings";
+import { changeCanvasDrawingState, changeCanvasLineWidth, changeCanvasStrokeStyle, clearCanvasPointsToDraw } from "../../store/canvasSettings";
 
 describe("test test suite", () => {
 
@@ -15,6 +15,10 @@ describe("test test suite", () => {
 		changeDrawingState: mockDispatchDrawingStateFn,
 		changeLineWidth: jest.fn() as unknown as typeof changeCanvasLineWidth,
 		changeStrokeStyle: jest.fn() as unknown as typeof changeCanvasStrokeStyle,
+		externalPointsToDraw: [],
+		clearPointsToDraw: jest.fn() as unknown as typeof clearCanvasPointsToDraw,
+		isMainDrawer: true,
+		authorDrawing: false,
 	};
 
 
@@ -34,7 +38,6 @@ describe("test test suite", () => {
 	test("tres", () => {
 		// placeholder third test
 		const testCanvas = shallow(<Canvas {...mockCanvasProps} />);
-
 		expect(testCanvas.instance()).toBeInstanceOf(Canvas);
 	});
 });

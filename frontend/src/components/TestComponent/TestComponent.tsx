@@ -1,19 +1,16 @@
 import * as React from "react";
-import classnames from "classnames";
 
 import styles from "./TestComponent.scss";
 import { connect } from "react-redux";
-import { changeSettings, selectYeet } from "../../store/settings";
 import { RootState } from "../../store";
-import { changeCanvasLineWidth } from "../../store/canvasSettings";
+import { changeCanvasLineWidth, changeCanvasStrokeStyle } from "../../store/canvasSettings";
 
 interface TestComponentProps {
-    yeet: boolean
 }
 
 interface TestComponentDispatchProps {
-    yoink: typeof changeSettings;
-    test: typeof changeCanvasLineWidth;
+    changeLineWidth: typeof changeCanvasLineWidth;
+	changeStrokeStyle: typeof changeCanvasStrokeStyle;
 }
 
 export class TestComponent extends React.Component<TestComponentProps & TestComponentDispatchProps> {
@@ -21,17 +18,29 @@ export class TestComponent extends React.Component<TestComponentProps & TestComp
 	public render() {
 		return (
 			<>
-				<button
-					className={styles.pointer}
-					onClick={() => {
-						this.props.yoink(false);
-						this.props.test(22);
-					}}>123</button>
-				<div className={styles.test}> MOOO </div>
-				<div className={classnames(styles.ginormous, {
-					[styles.fun]: true,
-				})}> Pretty pictures and funny memes </div>
-				{this.props.yeet && "the connect worked"}
+				<div className={"buttonsContainer"}>
+					<button
+						className={styles.pointer}
+						onClick={() => {
+							this.props.changeLineWidth(42);
+						}}>BIG</button>
+					<button
+						className={styles.pointer}
+						onClick={() => {
+							this.props.changeLineWidth(10);
+						}}>SMALL</button>
+					<button
+						className={styles.pointer}
+						onClick={() => {
+							this.props.changeStrokeStyle("green");
+						}}>GREEN</button>
+					<button
+						className={styles.pointer}
+						onClick={() => {
+							this.props.changeStrokeStyle("blue");
+						}}>BLUE</button>
+				</div>
+				<div className={styles.test}> Whiteboard test </div>
 			</>
 		);
 	}
@@ -39,14 +48,12 @@ export class TestComponent extends React.Component<TestComponentProps & TestComp
 }
 
 function mapStateToProps(state: RootState): TestComponentProps {
-	return {
-		yeet: selectYeet(state),
-	};
+	return {};
 }
 
-const mapDispatchToProps = {
-	yoink: changeSettings,
-	test: changeCanvasLineWidth,
+const mapDispatchToProps: TestComponentDispatchProps = {
+	changeLineWidth: changeCanvasLineWidth,
+	changeStrokeStyle: changeCanvasStrokeStyle,
 };
 
 export const TestComponentConnected = connect<TestComponentProps, TestComponentDispatchProps, {}, RootState>(mapStateToProps, mapDispatchToProps)(TestComponent);

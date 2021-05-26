@@ -6,6 +6,7 @@ export interface SettingsState {
     roomInitialized: boolean;
     userCreated: boolean;
     socketConnectionMade: boolean;
+    isMainDrawer: boolean;
 }
 
 export const settingsInitialState: SettingsState = {
@@ -13,6 +14,7 @@ export const settingsInitialState: SettingsState = {
 	roomInitialized: false,
 	userCreated: false,
 	socketConnectionMade: false,
+	isMainDrawer: false,
 };
 
 const settingsSlice = createSlice({
@@ -43,10 +45,16 @@ const settingsSlice = createSlice({
 				socketConnectionMade: action.payload,
 			};
 		},
+		changeMainDrawer(state, action: PayloadAction<boolean>) {
+			return {
+				...state,
+				isMainDrawer: action.payload,
+			};
+		},
 	},
 });
 
-export const { changeSettings } = settingsSlice.actions;
+export const { changeSettings, changeSocketConnectionMade, changeMainDrawer } = settingsSlice.actions;
 
 export function selectYeet(state: RootState) {
 	return state.settings.yeet;
@@ -62,6 +70,10 @@ export function selectUserCreated(state: RootState) {
 
 export function selectSocketConnectionMade(state: RootState) {
 	return state.settings.socketConnectionMade;
+}
+
+export function selectMainDrawer(state: RootState) {
+	return state.settings.isMainDrawer;
 }
 
 export const settingsReducer = settingsSlice.reducer;

@@ -9,6 +9,7 @@ import {
 import { HomeScreenConnected } from "./components/HomeScreen/HomeScreen";
 
 // React.lazy() route component importing?
+// wrap suspense around router
 
 export function App() {
 	return (
