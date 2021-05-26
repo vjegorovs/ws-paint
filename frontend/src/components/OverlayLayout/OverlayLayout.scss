@@ -29,6 +29,9 @@
   opacity: 1;
   filter: blur(0px);
   transition: opacity 0.2s ease, blur 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 
   &.isDrawing {
     pointer-events: none;
