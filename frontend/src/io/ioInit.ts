@@ -1,6 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { changeSocketConnectionMade, changeMainDrawer } from "../store/settings";
+import { RootState, store } from "../store";
 import { store } from "../store";
+
 import {
 	selectCanvasSettingsState,
 	addCanvasPointsToDraw,
@@ -11,6 +13,9 @@ import {
 	selectRecentlySyncedWithServer,
 	// addCanvasPointsToDrawBulk,
 } from "../store/canvasSettings";
+
+import { Selector } from "reselect";
+import { Action } from "@reduxjs/toolkit";
 
 
 const ioServerPath = "http://localhost:7777/";
@@ -66,3 +71,44 @@ export const sendSettingsToServer = (currentState = store.getState()) => {
 	ioTransport.emit("changeSettings", selectCanvasSettingsState(currentState));
 };
 
+
+export const sendMessageToServerWrapper = (
+	currentState = store.getState(),
+	messageType: string,
+	customArgs = {},
+	customSelector?: Selector<RootState, any>,
+) => {
+	ioTransport.emit(`outGoingMessage/${messageType}`, {
+		...customArgs,
+		extraSelectorData: customSelector?.(currentState),
+	});
+};
+
+export const GENERIC_OUTGOING_MESSAGE = "GENERIC_OUTGOING_MESSAGE";
+
+export interface GenericOutgoingMessage extends Action {
+	type: typeof GENERIC_OUTGOING_MESSAGE;
+	payload: {
+		messageType: string;
+		additionalData: {
+			additionalDataType: string;
+			data: any;
+		} | false;
+	};
+}
+
+export function dispatchGenericOutgoingMessage(
+	messageType: string,
+	additionalData: {
+		additionalDataType: string;
+		data: any;
+	} | false = false,
+): GenericOutgoingMessage {
+	return {
+		type: GENERIC_OUTGOING_MESSAGE,
+		payload: {
+			messageType: messageType,
+			additionalData: additionalData,
+		},
+	};
+}

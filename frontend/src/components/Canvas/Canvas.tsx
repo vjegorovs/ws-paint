@@ -14,6 +14,8 @@ import {
 	selectCanvasStrokeStyle,
 	clearCanvasPointsToDraw, selectAuthorDrawing,
 } from "../../store/canvasSettings";
+
+import { dispatchGenericOutgoingMessage } from "../../io/ioInit";
 import { ioTransport } from "../../io/ioInit";
 import { selectMainDrawer } from "../../store/settings";
 
@@ -31,6 +33,7 @@ export interface CanvasDispatchProps {
     changeDrawingState: typeof changeCanvasDrawingState;
     changeStrokeStyle: typeof changeCanvasStrokeStyle;
     clearPointsToDraw: typeof clearCanvasPointsToDraw;
+	sendMessageToServer: typeof dispatchGenericOutgoingMessage;
 }
 
 export type CanvasProps = CanvasOwnProps & CanvasDispatchProps;
@@ -63,7 +66,7 @@ export class Canvas extends React.Component<CanvasProps> {
     		this.canvasElement.style.width = `${innerWidth}px`;
     		this.canvasElement.style.height = `${innerHeight}px`;
     		this.canvasContext = this.canvasElement.getContext("2d");
-    		console.log(this.canvasContext);
+
     		if (this.canvasContext) {
     			this.canvasContext.scale(2, 2);
     			this.canvasContext.lineCap = "round";
@@ -85,6 +88,40 @@ export class Canvas extends React.Component<CanvasProps> {
     		this.canvasContext.lineWidth = this.props.lineWidth;
     		this.canvasContext.strokeStyle = this.props.strokeStyle;
     	}
+
+    	if (
+    	this.props.externalPointsToDraw !== nextProps.externalPointsToDraw
+    	&&
+    		nextProps.externalPointsToDraw.length > 0
+    	) {
+			if (this.stopId) {
+				window.clearTimeout(this.stopId);
+			}
+			if (this.flushPointsId) {
+				window.clearTimeout(this.flushPointsId);
+			}
+    		const pointsToDraw = nextProps.externalPointsToDraw;
+    		if (this.firstExternalInput) {
+    			this.start({} as any, pointsToDraw[this.externalCounter], false);
+    			this.externalCounter++;
+    			this.firstExternalInput = false;
+    		} else if (pointsToDraw[this.externalCounter]) {
+    			this.stopTicker = false;
+    			this.addPointToQueue(...(pointsToDraw[this.externalCounter] ?? pointsToDraw[this.externalCounter - 1]), false);
+    			this.externalCounter++;
+    		}
+
+			this.stopId = window.setTimeout(() => this.stopLoop(), 500);
+    	} else if (
+			nextProps.externalPointsToDraw.length > 0
+		) {
+    		this.flushPointsId = window.setTimeout(() => {
+    			this.props.clearPointsToDraw();
+    			this.externalCounter = 0;
+			}, 10000);
+		}
+
+
 		console.log(this.props.externalPointsToDraw !== nextProps.externalPointsToDraw
 			&&
 			nextProps.externalPointsToDraw.length > 0);
@@ -120,7 +157,6 @@ export class Canvas extends React.Component<CanvasProps> {
 			}, 10000);
 		}
 
-
     	return false;
 	}
 
@@ -138,11 +174,11 @@ export class Canvas extends React.Component<CanvasProps> {
     					}
     				}}
     				onMouseDown={(e) => {
-    					ioTransport.emit("mouseDownEvent");
+						this.props.sendMessageToServer("mouseDownEvent");
     					this.start(e);
     				}}
     				onMouseUp={(e) => {
-    					ioTransport.emit("mouseUpEvent");
+						this.props.sendMessageToServer("mouseUpEvent");	
     					this.end();
     				}}
     			>
@@ -217,9 +253,12 @@ export class Canvas extends React.Component<CanvasProps> {
 
     private addPointToQueue = (x: number, y: number, shouldEmit = true) => {
     	if (shouldEmit) {
-    		ioTransport.emit("sendDraw", {
-    			x,
-    			y,
+    		this.props.sendMessageToServer("sendDraw", {
+    			additionalDataType: "drawingCoordinates",
+    			data: {
+    				x,
+    				y,
+    			},
     		});
     	}
     	this.drawingQueue.push([x, y]);
@@ -242,6 +281,7 @@ const mapDispatchToProps: CanvasDispatchProps = {
 	changeStrokeStyle: changeCanvasStrokeStyle,
 	changeDrawingState: changeCanvasDrawingState,
 	clearPointsToDraw: clearCanvasPointsToDraw,
+	sendMessageToServer: dispatchGenericOutgoingMessage,
 };
 
 export const CanvasConnected = connect<CanvasOwnProps, CanvasDispatchProps, {}, RootState>(mapStateToProps, mapDispatchToProps)(Canvas);

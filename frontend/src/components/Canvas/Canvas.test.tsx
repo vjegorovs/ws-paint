@@ -3,6 +3,8 @@ import { mount, shallow } from "enzyme";
 
 import { Canvas, CanvasProps } from "./Canvas";
 import { changeCanvasDrawingState, changeCanvasLineWidth, changeCanvasStrokeStyle, clearCanvasPointsToDraw } from "../../store/canvasSettings";
+import { dispatchGenericOutgoingMessage } from "../../io/ioInit";
+
 
 describe("test test suite", () => {
 
@@ -17,6 +19,7 @@ describe("test test suite", () => {
 		changeStrokeStyle: jest.fn() as unknown as typeof changeCanvasStrokeStyle,
 		externalPointsToDraw: [],
 		clearPointsToDraw: jest.fn() as unknown as typeof clearCanvasPointsToDraw,
+		sendMessageToServer: jest.fn() as unknown as typeof dispatchGenericOutgoingMessage,
 		isMainDrawer: true,
 		authorDrawing: false,
 	};

@@ -3,6 +3,7 @@ import { changeSettings, settingsReducer } from "./settings";
 import { testReducer } from "../components/TestComponent/state/TestComponent";
 import { canvasSettingsReducer } from "./canvasSettings";
 import { canvasSettingsMiddleware } from "./middlewares/canvasSettingsMiddleware";
+import { websocketMessageMiddleware } from "./middlewares/websocketMessageMiddleware";
 
 export type RootState = ReturnType<typeof rootReducer>;
 
@@ -15,7 +16,7 @@ const rootReducer = combineReducers({
 
 export const store = configureStore({
 	reducer: rootReducer,
-	middleware: [canvasSettingsMiddleware] as const,
+	middleware: [canvasSettingsMiddleware, websocketMessageMiddleware] as const,
 });
 
 
