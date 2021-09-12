@@ -5,6 +5,7 @@ import { Canvas, CanvasProps } from "./Canvas";
 import { changeCanvasDrawingState, changeCanvasLineWidth, changeCanvasStrokeStyle, clearCanvasPointsToDraw } from "../../store/canvasSettings";
 import { dispatchGenericOutgoingMessage } from "../../io/ioInit";
 
+
 describe("test test suite", () => {
 
 	const mockDispatchDrawingStateFn = jest.fn() as unknown as typeof changeCanvasDrawingState;

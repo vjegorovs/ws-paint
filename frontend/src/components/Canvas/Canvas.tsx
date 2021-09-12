@@ -14,7 +14,9 @@ import {
 	selectCanvasStrokeStyle,
 	clearCanvasPointsToDraw, selectAuthorDrawing,
 } from "../../store/canvasSettings";
+
 import { dispatchGenericOutgoingMessage } from "../../io/ioInit";
+import { ioTransport } from "../../io/ioInit";
 import { selectMainDrawer } from "../../store/settings";
 
 export interface CanvasOwnProps {
@@ -120,10 +122,46 @@ export class Canvas extends React.Component<CanvasProps> {
 		}
 
 
+		console.log(this.props.externalPointsToDraw !== nextProps.externalPointsToDraw
+			&&
+			nextProps.externalPointsToDraw.length > 0);
+    	if (
+    	this.props.externalPointsToDraw !== nextProps.externalPointsToDraw
+    	&&
+    		nextProps.externalPointsToDraw.length > 0
+    	) {
+			if (this.stopId) {
+				window.clearTimeout(this.stopId);
+			}
+			if (this.flushPointsId) {
+				window.clearTimeout(this.flushPointsId);
+			}
+    		const pointsToDraw = nextProps.externalPointsToDraw;
+    		if (this.firstExternalInput) {
+    			this.start({} as any, pointsToDraw[this.externalCounter], false);
+    			this.externalCounter++;
+    			this.firstExternalInput = false;
+    		} else if (pointsToDraw[this.externalCounter]) {
+    			this.stopTicker = false;
+    			this.addPointToQueue(...(pointsToDraw[this.externalCounter] ?? pointsToDraw[this.externalCounter - 1]), false);
+    			this.externalCounter++;
+    		}
+
+			this.stopId = window.setTimeout(() => this.stopLoop(), 500);
+    	} else if (
+			nextProps.externalPointsToDraw.length > 0
+		) {
+    		this.flushPointsId = window.setTimeout(() => {
+    			this.props.clearPointsToDraw();
+    			this.externalCounter = 0;
+			}, 10000);
+		}
+
     	return false;
 	}
 
 	public render() {
+    	console.log("cnavas rerender");
     	return (
     		<>
     			<canvas
@@ -140,7 +178,7 @@ export class Canvas extends React.Component<CanvasProps> {
     					this.start(e);
     				}}
     				onMouseUp={(e) => {
-						this.props.sendMessageToServer("mouseUpEvent");
+						this.props.sendMessageToServer("mouseUpEvent");	
     					this.end();
     				}}
     			>
@@ -197,6 +235,7 @@ export class Canvas extends React.Component<CanvasProps> {
     				this.canvasContext.lineTo(this.drawingQueue[this.queueCounter][X], this.drawingQueue[this.queueCounter][Y]);
     			}
     		}
+    		console.log("STROKE");
     		this.canvasContext.stroke();
     	}
 

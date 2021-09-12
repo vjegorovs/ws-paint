@@ -1,6 +1,8 @@
 import { io, Socket } from "socket.io-client";
 import { changeSocketConnectionMade, changeMainDrawer } from "../store/settings";
 import { RootState, store } from "../store";
+import { store } from "../store";
+
 import {
 	selectCanvasSettingsState,
 	addCanvasPointsToDraw,
@@ -11,6 +13,7 @@ import {
 	selectRecentlySyncedWithServer,
 	// addCanvasPointsToDrawBulk,
 } from "../store/canvasSettings";
+
 import { Selector } from "reselect";
 import { Action } from "@reduxjs/toolkit";
 
@@ -68,6 +71,7 @@ export const sendSettingsToServer = (currentState = store.getState()) => {
 	ioTransport.emit("changeSettings", selectCanvasSettingsState(currentState));
 };
 
+
 export const sendMessageToServerWrapper = (
 	currentState = store.getState(),
 	messageType: string,
@@ -108,4 +112,3 @@ export function dispatchGenericOutgoingMessage(
 		},
 	};
 }
-
