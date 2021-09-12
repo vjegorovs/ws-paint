@@ -14,7 +14,7 @@ import {
 	selectCanvasStrokeStyle,
 	clearCanvasPointsToDraw, selectAuthorDrawing,
 } from "../../store/canvasSettings";
-import { ioTransport } from "../../io/ioInit";
+import { dispatchGenericOutgoingMessage } from "../../io/ioInit";
 import { selectMainDrawer } from "../../store/settings";
 
 export interface CanvasOwnProps {
@@ -31,6 +31,7 @@ export interface CanvasDispatchProps {
     changeDrawingState: typeof changeCanvasDrawingState;
     changeStrokeStyle: typeof changeCanvasStrokeStyle;
     clearPointsToDraw: typeof clearCanvasPointsToDraw;
+	sendMessageToServer: typeof dispatchGenericOutgoingMessage;
 }
 
 export type CanvasProps = CanvasOwnProps & CanvasDispatchProps;
@@ -63,7 +64,7 @@ export class Canvas extends React.Component<CanvasProps> {
     		this.canvasElement.style.width = `${innerWidth}px`;
     		this.canvasElement.style.height = `${innerHeight}px`;
     		this.canvasContext = this.canvasElement.getContext("2d");
-    		console.log(this.canvasContext);
+
     		if (this.canvasContext) {
     			this.canvasContext.scale(2, 2);
     			this.canvasContext.lineCap = "round";
@@ -85,9 +86,7 @@ export class Canvas extends React.Component<CanvasProps> {
     		this.canvasContext.lineWidth = this.props.lineWidth;
     		this.canvasContext.strokeStyle = this.props.strokeStyle;
     	}
-		console.log(this.props.externalPointsToDraw !== nextProps.externalPointsToDraw
-			&&
-			nextProps.externalPointsToDraw.length > 0);
+
     	if (
     	this.props.externalPointsToDraw !== nextProps.externalPointsToDraw
     	&&
@@ -125,7 +124,6 @@ export class Canvas extends React.Component<CanvasProps> {
 	}
 
 	public render() {
-    	console.log("cnavas rerender");
     	return (
     		<>
     			<canvas
@@ -138,11 +136,11 @@ export class Canvas extends React.Component<CanvasProps> {
     					}
     				}}
     				onMouseDown={(e) => {
-    					ioTransport.emit("mouseDownEvent");
+						this.props.sendMessageToServer("mouseDownEvent");
     					this.start(e);
     				}}
     				onMouseUp={(e) => {
-    					ioTransport.emit("mouseUpEvent");
+						this.props.sendMessageToServer("mouseUpEvent");
     					this.end();
     				}}
     			>
@@ -199,7 +197,6 @@ export class Canvas extends React.Component<CanvasProps> {
     				this.canvasContext.lineTo(this.drawingQueue[this.queueCounter][X], this.drawingQueue[this.queueCounter][Y]);
     			}
     		}
-    		console.log("STROKE");
     		this.canvasContext.stroke();
     	}
 
@@ -217,9 +214,12 @@ export class Canvas extends React.Component<CanvasProps> {
 
     private addPointToQueue = (x: number, y: number, shouldEmit = true) => {
     	if (shouldEmit) {
-    		ioTransport.emit("sendDraw", {
-    			x,
-    			y,
+    		this.props.sendMessageToServer("sendDraw", {
+    			additionalDataType: "drawingCoordinates",
+    			data: {
+    				x,
+    				y,
+    			},
     		});
     	}
     	this.drawingQueue.push([x, y]);
@@ -242,6 +242,7 @@ const mapDispatchToProps: CanvasDispatchProps = {
 	changeStrokeStyle: changeCanvasStrokeStyle,
 	changeDrawingState: changeCanvasDrawingState,
 	clearPointsToDraw: clearCanvasPointsToDraw,
+	sendMessageToServer: dispatchGenericOutgoingMessage,
 };
 
 export const CanvasConnected = connect<CanvasOwnProps, CanvasDispatchProps, {}, RootState>(mapStateToProps, mapDispatchToProps)(Canvas);

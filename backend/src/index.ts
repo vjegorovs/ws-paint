@@ -41,6 +41,10 @@ io.on("connection", (socket: Socket) => {
         })
     }
 
+    socket.prependAny((event, ...args) => {
+        console.log(`got ${event}`);
+    });
+
     socket.on("requestFullCatchUp", () => {
         socket.emit("fullCatchUp", coordinateArray);
     })
