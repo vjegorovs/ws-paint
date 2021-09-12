@@ -41,8 +41,17 @@ io.on("connection", (socket: Socket) => {
         })
     }
 
-    socket.prependAny((event, ...args) => {
+    // Following prepend is a catch mechanism for all generic incoming messages
+    socket.prependAny((event, additionalData: {}) => {
         console.log(`got ${event}`);
+
+        if (event.includes("outGoingMessage")) {
+            const incomingEventName = event.split("/")[1];
+            console.log(incomingEventName);
+            console.log(additionalData);
+
+            //#TODO: Create a handler switch based on eventName, remove current raw "socket.on" listeners
+        }
     });
 
     socket.on("requestFullCatchUp", () => {

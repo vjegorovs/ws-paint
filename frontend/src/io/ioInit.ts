@@ -1,7 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { changeSocketConnectionMade, changeMainDrawer } from "../store/settings";
 import { RootState, store } from "../store";
-import { store } from "../store";
 
 import {
 	selectCanvasSettingsState,
@@ -29,6 +28,18 @@ export const initSocketConnection = () => {
 		console.log(socket, " user connected");
 	});
 
+	//#TODO: Refactor raw io.on listeners to generic incoming message listeners, after backend refactor is done
+	ioTransport.prependAny((event, additionalData: {}) => {
+		console.log(`got ${event}`);
+
+		if (event.includes("incomingMessage")) {
+			const incomingEventName = event.split("/")[1];
+			console.log(incomingEventName);
+			console.log(additionalData);
+
+			//#TODO: Create a handler/reducer for incoming events
+		}
+	});
 	ioTransport.on("mainDrawer", () => {
 		store.dispatch(changeMainDrawer(true));
 	});
@@ -85,6 +96,7 @@ export const sendMessageToServerWrapper = (
 };
 
 export const GENERIC_OUTGOING_MESSAGE = "GENERIC_OUTGOING_MESSAGE";
+export const GENERIC_INCOMING_MESSAGE = "GENERIC_INCOMING_MESSAGE";
 
 export interface GenericOutgoingMessage extends Action {
 	type: typeof GENERIC_OUTGOING_MESSAGE;

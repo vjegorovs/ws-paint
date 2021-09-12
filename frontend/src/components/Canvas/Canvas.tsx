@@ -16,7 +16,6 @@ import {
 } from "../../store/canvasSettings";
 
 import { dispatchGenericOutgoingMessage } from "../../io/ioInit";
-import { ioTransport } from "../../io/ioInit";
 import { selectMainDrawer } from "../../store/settings";
 
 export interface CanvasOwnProps {
@@ -178,7 +177,7 @@ export class Canvas extends React.Component<CanvasProps> {
     					this.start(e);
     				}}
     				onMouseUp={(e) => {
-						this.props.sendMessageToServer("mouseUpEvent");	
+						this.props.sendMessageToServer("mouseUpEvent");
     					this.end();
     				}}
     			>
